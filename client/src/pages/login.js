@@ -11,7 +11,6 @@ export default function Login() {
     const router = useRouter();
 
     useEffect(() => {
-        // Show success message if redirected from password reset
         if (router.query.reset === 'success') {
             setSuccess('Password has been reset successfully. Please log in with your new password.');
         }
@@ -48,30 +47,30 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 text-gray-900">
+        <div className="min-h-screen bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
                     Sign in to your account
                 </h2>
             </div>
 
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+                <div className="bg-gray-800 py-8 px-4 shadow sm:rounded-lg sm:px-10">
                     {error && (
-                        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative">
+                        <div className="mb-4 bg-red-900 border border-red-700 text-red-100 px-4 py-3 rounded relative">
                             {error}
                         </div>
                     )}
 
                     {success && (
-                        <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded relative">
+                        <div className="mb-4 bg-green-900 border border-green-700 text-green-100 px-4 py-3 rounded relative">
                             {success}
                         </div>
                     )}
 
                     <form className="space-y-6" onSubmit={handleSubmit}>
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-300">
                                 Email address
                             </label>
                             <div className="mt-1">
@@ -82,13 +81,13 @@ export default function Login() {
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                    className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-300">
                                 Password
                             </label>
                             <div className="mt-1">
@@ -99,7 +98,7 @@ export default function Login() {
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                    className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
                         </div>
@@ -107,7 +106,7 @@ export default function Login() {
                         <div className="text-right">
                             <Link
                                 href="/forgot-password"
-                                className="text-sm text-blue-600 hover:text-blue-500"
+                                className="text-sm text-blue-400 hover:text-blue-300 transition-colors duration-200"
                             >
                                 Forgot your password?
                             </Link>
@@ -117,7 +116,7 @@ export default function Login() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors duration-200"
                             >
                                 {loading ? 'Signing in...' : 'Sign in'}
                             </button>
@@ -127,9 +126,9 @@ export default function Login() {
                     <div className="mt-6">
                         <div className="relative">
                             <div className="relative flex justify-center text-sm">
-                                <span className="px-2 bg-white text-gray-500">
+                                <span className="px-2 bg-gray-800 text-gray-400">
                                     Don't have an account?{' '}
-                                    <Link href="/signup" className="text-blue-600 hover:text-blue-500">
+                                    <Link href="/signup" className="text-blue-400 hover:text-blue-300 transition-colors duration-200">
                                         Sign up
                                     </Link>
                                 </span>

@@ -13,43 +13,42 @@ function ChatPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Wait for router to be ready
         if (!router.isReady) return;
 
         if (router.query.docs) {
             setDocumentIds(router.query.docs.split(','));
         } else {
-            router.replace('/');
+            router.replace('/', undefined, { shallow: true }); // Added shallow: true to prevent full page reload
         }
         setLoading(false);
-    }, [router.isReady, router.query]);
+    }, [router.isReady, router.query, router.replace]); // Added router.replace to dependencies
 
     if (loading || !documentIds.length) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <div className="min-h-screen flex items-center justify-center bg-gray-900">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-                    <p className="mt-2 text-gray-600">Loading...</p>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                    <p className="mt-2 text-gray-300">Loading...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen flex flex-col text-gray-900 bg-gray-100">
-            <header className="bg-white border-b">
+        <div className="min-h-screen flex flex-col text-gray-100 bg-gray-900">
+            <header className="bg-gray-800 border-b border-gray-700">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="flex justify-between h-16 items-center">
                         <Link
                             href="/"
-                            className="flex items-center text-gray-600 hover:text-gray-900"
+                            className="flex items-center text-gray-300 hover:text-white transition-colors duration-200"
                         >
                             <ArrowLeft className="h-5 w-5 mr-2" />
                             Back to Documents
                         </Link>
                         <button
                             onClick={logout}
-                            className="inline-flex items-center px-4 py-2 text-sm text-gray-700 hover:text-gray-900"
+                            className="inline-flex items-center px-4 py-2 text-sm text-gray-300 hover:text-white transition-colors duration-200"
                         >
                             <LogOut className="h-5 w-5 mr-2" />
                             Logout
@@ -59,7 +58,7 @@ function ChatPage() {
             </header>
 
             <main className="flex-1 container mx-auto px-4 py-8">
-                <div className="bg-white rounded-lg shadow-lg h-[calc(100vh-200px)]">
+                <div className="bg-gray-800 rounded-lg shadow-lg h-[calc(100vh-200px)]">
                     <Chat documentIds={documentIds} />
                 </div>
             </main>
@@ -67,9 +66,7 @@ function ChatPage() {
     );
 }
 
-// Add getServerSideProps to handle SSR
 export async function getServerSideProps(context) {
-    // Just return empty props, the component will handle the data fetching
     return {
         props: {}
     };
