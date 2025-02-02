@@ -16,7 +16,7 @@ function ChatPage() {
         if (!router.isReady) return;
 
         if (router.query.docs) {
-            setDocumentIds(router.query.docs.split(','));
+            setDocumentIds(router.query.docs.split('_'));
         } else {
             router.replace('/', undefined, { shallow: true }); // Added shallow: true to prevent full page reload
         }

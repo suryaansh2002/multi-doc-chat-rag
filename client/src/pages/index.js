@@ -61,7 +61,7 @@ function Home() {
     if (selectedDocs.length > 0) {
       router.push({
         pathname: "/chat",
-        query: { docs: selectedDocs.join(",") },
+        query: { docs: selectedDocs.join("_") },
       })
     }
   }
