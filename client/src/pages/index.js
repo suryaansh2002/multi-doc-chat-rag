@@ -228,7 +228,7 @@ function FileList({ documents, selectedDocs, onDocumentSelect, onDocumentsChange
     setError(null)
 
     try {
-      const response = await fetch(`http://localhost:3001/api/upload/${documentToDelete._id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload/${documentToDelete._id}`, {
         method: "DELETE",
         headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
