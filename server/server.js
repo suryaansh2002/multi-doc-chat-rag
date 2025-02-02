@@ -21,6 +21,11 @@ db.once('open', () => {
     console.log('Connected to MongoDB');
 });
 
+
+app.get('/',(req,res)=>{
+    res.send("Welcome to RAG Chat server")
+ })
+ 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/auth', require('./routes/passwordReset')); // New password reset routes
