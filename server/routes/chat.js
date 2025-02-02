@@ -2,9 +2,14 @@ const express = require('express');
 const router = express.Router();
 const { PineconeService } = require('../services/pinecone');
 const { OpenAIService } = require('../services/openai');
+const Document = require('../models/document');
+const auth = require('../middleware/auth');
 
 const pineconeService = new PineconeService();
 const openaiService = new OpenAIService();
+
+// Add auth middleware
+router.use(auth);
 
 router.post('/query', async (req, res) => {
     try {
@@ -14,20 +19,37 @@ router.post('/query', async (req, res) => {
             return res.status(400).json({ error: 'Invalid request parameters' });
         }
 
+        // Verify user has access to these documents
+        const documents = await Document.find({
+            _id: { $in: documentIds },
+            userId: req.user._id
+        });
+
+        if (documents.length !== documentIds.length) {
+            return res.status(403).json({ error: 'Access denied to one or more documents' });
+        }
+
         // Get relevant context from Pinecone
         const relevantContexts = await pineconeService.queryVectors(query, documentIds);
 
-        // Combine contexts
-        const combinedContext = relevantContexts
-            .map(context => context.text)
-            .join('\n\n');
+        // Combine contexts with a maximum length limit
+        const maxContextLength = 4000; // Adjust based on your needs
+        let combinedContext = '';
+        let usedContexts = [];
 
-        // Generate response using OpenAI
+        for (const context of relevantContexts) {
+            if (combinedContext.length + context.text.length <= maxContextLength) {
+                combinedContext += context.text + '\n\n';
+                usedContexts.push(context);
+            }
+        }
+
+        // Generate response using OpenAI service
         const response = await openaiService.generateResponse(query, combinedContext);
 
         res.json({
             response,
-            sources: relevantContexts
+            sources: usedContexts
         });
     } catch (error) {
         console.error('Chat error:', error);

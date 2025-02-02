@@ -10,8 +10,13 @@ const documentSchema = new mongoose.Schema({
         required: true
     },
     vectorIds: [{
-        type: String  // Store Pinecone vector IDs
+        type: String
     }],
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
     uploadDate: {
         type: Date,
         default: Date.now

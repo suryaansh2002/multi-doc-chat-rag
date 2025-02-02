@@ -1,9 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const multer = require('multer');
 const cors = require('cors');
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
 
 const app = express();
 
@@ -11,24 +9,29 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const uri = "mongodb+srv://suryaanshr:suryaanshr@cluster0.cf8ht.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("Connected to MongoDB"))
-  .catch(err => console.error("MongoDB Connection Error:", err));
+// MongoDB connection
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
 
-// Multer configuration for file uploads
-const storage = multer.memoryStorage();
-const upload = multer({
-    storage: storage,
-    limits: {
-        fileSize: 50 * 1024 * 1024 // 50MB limit
-    }
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.once('open', () => {
+    console.log('Connected to MongoDB');
 });
 
 // Routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/auth', require('./routes/passwordReset')); // New password reset routes
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/chat', require('./routes/chat'));
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Something broke!' });
+});
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

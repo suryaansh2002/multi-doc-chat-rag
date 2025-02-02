@@ -21,8 +21,11 @@ export default function FileUpload({ onUploadSuccess }) {
         formData.append('file', file);
 
         try {
-            const response = await fetch('http://localhost:3001/api/upload', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload`, {
                 method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
                 body: formData,
             });
 
