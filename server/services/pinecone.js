@@ -114,12 +114,12 @@ class PineconeService {
         
     async createEmbeddings(texts) {
         try {
-            const response = await this.openai.embeddings.create({
+            const response = await this.openai.createEmbedding({
                 model: "text-embedding-ada-002",
                 input: texts // Send all chunks at once
             });
             console.log(`Generated ${response.data.length} embeddings`);
-            return response.data.map(item => item.embedding);
+            return response.data.data.map(item => item.embedding);
         } catch (error) {
             console.error('Error creating embeddings:', error);
             throw error;

@@ -10,15 +10,15 @@ class OpenAIService {
   }
 
   async createEmbedding(text) {
-    const response = await this.client.embeddings.create({
+    const response = await this.client.createEmbedding({
       model: "text-embedding-ada-002",
       input: text,
     });
-    return response.data[0].embedding;
+    return response.data.data[0].embedding;
   }
 
   async generateResponse(query, context) {
-    const response = await this.client.chat.completions.create({
+    const response = await this.client.createChatCompletion({
       model: "gpt-4-turbo-preview",
       messages: [
         {
@@ -31,11 +31,12 @@ class OpenAIService {
           content: `Context: ${context}\n\nQuestion: ${query}`,
         },
       ],
-      temperature: 0.7,
+      temperature: 0.8,
       max_tokens: 500,
     });
 
-    return response.choices[0].message.content;
+    return response.data.choices[0].message.content;
+
   }
 }
 
