@@ -31,17 +31,16 @@ router.post('/query/context', async (req, res) => {
 
         // Get relevant context from Pinecone
         const relevantContexts = await pineconeService.queryVectors(query, documentIds);
-
         // Combine contexts with a maximum length limit
         const maxContextLength = 4000;
         let combinedContext = '';
         let usedContexts = [];
 
         for (const context of relevantContexts) {
-            if (combinedContext.length + context.text.length <= maxContextLength) {
+            // if (combinedContext.length + context.text.length <= maxContextLength) {
                 combinedContext += context.text + '\n\n';
                 usedContexts.push(context);
-            }
+            // }
         }
 
         res.json({
