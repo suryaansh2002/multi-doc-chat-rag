@@ -71,17 +71,15 @@ export default function Chat({ documentIds }) {
         }
 
         const responseData = await responseResponse.json();
-
         // Update with final message
-        setMessages((prev) => {
-            const newMessages = [...prev];
-            newMessages[newMessages.length - 1] = {
-                type: "assistant",
-                content: responseData.response,
-                sources: contextData.sources
-            };
-            return newMessages;
-        });
+        const assistantMessage = {
+          type: "assistant",
+          content: responseData.response,
+          sources: contextData.sources
+      }
+        setMessages((prev) => [...prev, assistantMessage]);
+
+   
 
     } catch (error) {
         console.error("Chat error:", error);

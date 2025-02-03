@@ -70,7 +70,7 @@ export default function Signup() {
                         </div>
                     )}
 
-                    <form className="space-y-6" onSubmit={handleSubmit}>
+                    {/* <form className="space-y-6" onSubmit={handleSubmit}>
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-300">
                                 Email address
@@ -140,8 +140,11 @@ export default function Signup() {
                                 {loading ? 'Creating account...' : 'Create account'}
                             </button>
                         </div>
-                    </form>
+                    </form> */}
 
+                    <div className=' text-gray-200 text-center'>
+                        Currently Sign up has been disabled, if you'd like to try it out, you can reach out at <a href='mailto:suryaansh2002@gmail.com' className='text-blue-400 hover:text-blue-300 transition-colors duration-200"'>suryaansh2002@gmail.com</a> 
+                    </div>
                     <div className="mt-6">
                         <div className="relative">
                             <div className="relative flex justify-center text-sm">
