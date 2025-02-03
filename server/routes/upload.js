@@ -4,36 +4,70 @@ const multer = require('multer');
 const Document = require('../models/document');
 const { PineconeService } = require('../services/pinecone');
 const auth = require('../middleware/auth');
-const pdf = require('pdf-parse');
-
+const pdfParse = require('pdf-parse');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const pineconeService = new PineconeService();
+const { TokenTextSplitter } = require("langchain/text_splitter");
 
 // Add auth middleware to all routes
 router.use(auth);
 
-// Upload route
+
+async function splitIntoChunks(text) {
+    // Clean text while preserving structure
+    const cleanText = cleanProcessText(text);
+    
+    // Initialize token-based splitter
+    const splitter = new TokenTextSplitter({
+        encodingName: "cl100k_base", // OpenAI's tokenizer
+        chunkSize: 512,
+        chunkOverlap: 50,
+        allowedSpecial: "all" // Handle special tokens properly
+    });
+
+    // Split text into chunks
+    let chunks = await splitter.splitText(cleanText);
+
+    // Post-process chunks
+    return postProcessChunks(chunks);
+}
+
+function cleanProcessText(text) {
+    return text
+        .replace(/\r\n/g, '\n') // Normalize line breaks
+        .replace(/(\n\s*){2,}/g, '\n\n') // Preserve paragraph breaks
+        .replace(/[^\S\n]+/g, ' ') // Collapse multiple spaces
+        .trim();
+}
+
+function  postProcessChunks(chunks) {
+    const seen = new Set();
+    return chunks.filter(chunk => {
+        const content = chunk.trim();
+        // Remove empty chunks and duplicates (case-sensitive)
+        return content.length > 0 && !seen.has(content) && seen.add(content);
+    });
+}
+
+
 router.post('/', upload.single('file'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded' });
         }
-
-        // Parse PDF content
-        const pdfData = await pdf(req.file.buffer);
-        const textContent = pdfData.text;
-
+        const { text } = await pdfParse(req.file.buffer);
         // Create document in MongoDB with user ID
+        console.log(text)
         const document = new Document({
             filename: req.file.originalname,
-            content: textContent,
+            content: text,
             fileSize: req.file.size,
             userId: req.user._id  // Add user ID from auth middleware
         });
 
-        // Split content into chunks
-        const chunks = pineconeService.splitIntoChunks(textContent);
+        // // Split content into chunks
+        const chunks = await splitIntoChunks(text);
         console.log(chunks)
         console.log(`Created ${chunks.length} chunks from document`);
         // Store vectors and get vector IDs
@@ -42,7 +76,6 @@ router.post('/', upload.single('file'), async (req, res) => {
         // Store vector IDs in document
         document.vectorIds = vectorIds;
         await document.save();
-
         res.status(200).json({
             message: 'File uploaded successfully',
             documentId: document._id
