@@ -11,7 +11,7 @@ const openaiService = new OpenAIService();
 // Add auth middleware
 router.use(auth);
 
-router.post('/query', async (req, res) => {
+router.post('/query/context', async (req, res) => {
     try {
         const { query, documentIds } = req.body;
 
@@ -33,7 +33,7 @@ router.post('/query', async (req, res) => {
         const relevantContexts = await pineconeService.queryVectors(query, documentIds);
 
         // Combine contexts with a maximum length limit
-        const maxContextLength = 4000; // Adjust based on your needs
+        const maxContextLength = 4000;
         let combinedContext = '';
         let usedContexts = [];
 
@@ -44,17 +44,32 @@ router.post('/query', async (req, res) => {
             }
         }
 
-        // Generate response using OpenAI service
-        const response = await openaiService.generateResponse(query, combinedContext);
-
         res.json({
-            response,
+            context: combinedContext,
             sources: usedContexts
         });
     } catch (error) {
-        console.error('Chat error:', error);
-        res.status(500).json({ error: 'Error processing chat query' });
+        console.error('Context fetch error:', error);
+        res.status(500).json({ error: 'Error fetching context' });
     }
 });
+
+// Second endpoint to get LLM response
+router.post('/query/response', async (req, res) => {
+    try {
+        const { query, context } = req.body;
+
+        if (!query || !context) {
+            return res.status(400).json({ error: 'Invalid request parameters' });
+        }
+
+        const response = await openaiService.generateResponse(query, context);
+        res.json({ response });
+    } catch (error) {
+        console.error('Response generation error:', error);
+        res.status(500).json({ error: 'Error generating response' });
+    }
+});
+
 
 module.exports = router;

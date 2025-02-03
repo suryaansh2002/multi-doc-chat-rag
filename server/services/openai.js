@@ -25,7 +25,7 @@ class OpenAIService {
   async generateResponse(query, context) {
     try {
       const response = await this.client.createChatCompletion({
-        model: "gpt-4-turbo-preview",
+        model: "gpt-4-0125-preview", // Base GPT-4, often faster than turbo
         messages: [
           {
             role: "system",
@@ -38,7 +38,7 @@ class OpenAIService {
           },
         ],
         temperature: 0.8,
-        max_tokens: 500,
+        max_tokens: 300,
       });
 
       return response.data.choices[0].message.content;
