@@ -10,16 +10,16 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
+// mongoose.connect(process.env.MONGODB_URI, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true
+// });
 
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-db.once('open', () => {
-    console.log('Connected to MongoDB');
-});
+// const db = mongoose.connection;
+// db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+// db.once('open', () => {
+//     console.log('Connected to MongoDB');
+// });
 
 
 app.get('/',(req,res)=>{
@@ -27,10 +27,10 @@ app.get('/',(req,res)=>{
  })
  
 // Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/auth', require('./routes/passwordReset')); // New password reset routes
-app.use('/api/upload', require('./routes/upload'));
-app.use('/api/chat', require('./routes/chat'));
+// app.use('/api/auth', require('./routes/auth'));
+// app.use('/api/auth', require('./routes/passwordReset')); // New password reset routes
+// app.use('/api/upload', require('./routes/upload'));
+// app.use('/api/chat', require('./routes/chat'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
