@@ -6,6 +6,7 @@
 2. [Features](#features)
 3. [Setup Instructions](#setup-instructions)
 4. [Project Structure](#project-structure)
+5. [Deployment](#deployment)
 5. [Navigation](#navigation)
 6. [License](#license)
 
@@ -76,6 +77,12 @@ This project is a Document Q&A System that allows users to upload PDF documents,
   - Chat Component: `client/src/components/Chat.js` (startLine: 7, endLine: 68)
 
 - **Styles**: Global styles for the application, ensuring a consistent look and feel across different components and pages.
+
+## Deployment
+
+- **Server**: Deployed on Vercel at [https://multi-doc-chat-rag.vercel.app/](https://multi-doc-chat-rag.vercel.app/)
+- **Client**: Deployed on Vercel at [https://multi-doc-chat-rag-client.vercel.app/](https://multi-doc-chat-rag-client.vercel.app/)
+
 
 ## Navigation
 
