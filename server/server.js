@@ -27,10 +27,10 @@ app.get('/',(req,res)=>{
  })
  
 // Routes
-// app.use('/api/auth', require('./routes/auth'));
-// app.use('/api/auth', require('./routes/passwordReset')); // New password reset routes
-// app.use('/api/upload', require('./routes/upload'));
-// app.use('/api/chat', require('./routes/chat'));
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/auth', require('./routes/passwordReset')); // New password reset routes
+app.use('/api/upload', require('./routes/upload'));
+app.use('/api/chat', require('./routes/chat'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
