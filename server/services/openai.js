@@ -1,4 +1,4 @@
-const { Configuration, OpenAIApi } = require("openai");
+const { Configuration, OpenAIApi } = require('openai');
 
 class OpenAIService {
   constructor() {
@@ -10,33 +10,42 @@ class OpenAIService {
   }
 
   async createEmbedding(text) {
-    const response = await this.client.createEmbedding({
-      model: "text-embedding-ada-002",
-      input: text,
-    });
-    return response.data.data[0].embedding;
+    try {
+      const response = await this.client.createEmbedding({
+        model: "text-embedding-ada-002",
+        input: text,
+      });
+      return response.data.data[0].embedding;
+    } catch (error) {
+      console.error('Error creating embedding:', error);
+      throw error;
+    }
   }
 
   async generateResponse(query, context) {
-    const response = await this.client.createChatCompletion({
-      model: "gpt-4-turbo-preview",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a helpful assistant. Use the provided context to answer questions accurately. If you're not sure about something, say so. Return your answer in well structured, and formatted markdown.",
-        },
-        {
-          role: "user",
-          content: `Context: ${context}\n\nQuestion: ${query}`,
-        },
-      ],
-      temperature: 0.8,
-      max_tokens: 500,
-    });
+    try {
+      const response = await this.client.createChatCompletion({
+        model: "gpt-4-turbo-preview",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a helpful assistant. Use the provided context to answer questions accurately. If you're not sure about something, say so. Return your answer in well structured, and formatted markdown.",
+          },
+          {
+            role: "user",
+            content: `Context: ${context}\n\nQuestion: ${query}`,
+          },
+        ],
+        temperature: 0.8,
+        max_tokens: 500,
+      });
 
-    return response.data.choices[0].message.content;
-
+      return response.data.choices[0].message.content;
+    } catch (error) {
+      console.error('Error generating response:', error);
+      throw error;
+    }
   }
 }
 

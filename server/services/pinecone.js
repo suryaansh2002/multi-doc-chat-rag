@@ -1,5 +1,4 @@
 const { Pinecone } = require('@pinecone-database/pinecone');
-const OpenAI = require('openai');
 const { Configuration, OpenAIApi } = require('openai');
 
 class PineconeService {
@@ -118,7 +117,7 @@ class PineconeService {
                 model: "text-embedding-ada-002",
                 input: texts // Send all chunks at once
             });
-            console.log(`Generated ${response.data.length} embeddings`);
+            console.log(`Generated ${response.data.data.length} embeddings`);
             return response.data.data.map(item => item.embedding);
         } catch (error) {
             console.error('Error creating embeddings:', error);
