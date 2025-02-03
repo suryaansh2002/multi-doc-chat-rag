@@ -19,57 +19,83 @@ export default function Chat({ documentIds }) {
   }, [messages])
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!input.trim() || loading) return
+    e.preventDefault();
+    if (!input.trim() || loading) return;
 
     const userMessage = {
-      type: "user",
-      content: input,
-    }
+        type: "user",
+        content: input,
+    };
 
-    setMessages((prev) => [...prev, userMessage])
-    setInput("")
-    setLoading(true)
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setLoading(true);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/query`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({
-          query: input,
-          documentIds: documentIds,
-        }),
-      })
 
-      if (!response.ok) {
-        throw new Error("Failed to get response")
-      }
+        // First, get the relevant context
+        const contextResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/query/context`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            body: JSON.stringify({
+                query: input,
+                documentIds: documentIds,
+            }),
+        });
 
-      const data = await response.json()
+        if (!contextResponse.ok) {
+            throw new Error("Failed to get context");
+        }
 
-      const assistantMessage = {
-        type: "assistant",
-        content: data.response,
-        sources: data.sources,
-      }
+        const contextData = await contextResponse.json();
 
-      setMessages((prev) => [...prev, assistantMessage])
+
+        // Then, get the LLM response
+        const responseResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/query/response`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            body: JSON.stringify({
+                query: input,
+                context: contextData.context,
+            }),
+        });
+
+        if (!responseResponse.ok) {
+            throw new Error("Failed to get response");
+        }
+
+        const responseData = await responseResponse.json();
+
+        // Update with final message
+        setMessages((prev) => {
+            const newMessages = [...prev];
+            newMessages[newMessages.length - 1] = {
+                type: "assistant",
+                content: responseData.response,
+                sources: contextData.sources
+            };
+            return newMessages;
+        });
+
     } catch (error) {
-      console.error("Chat error:", error)
-      setMessages((prev) => [
-        ...prev,
-        {
-          type: "error",
-          content: "Sorry, there was an error processing your request.",
-        },
-      ])
+        console.error("Chat error:", error);
+        setMessages((prev) => [
+            ...prev,
+            {
+                type: "error",
+                content: "Sorry, there was an error processing your request.",
+            },
+        ]);
     } finally {
-      setLoading(false)
+        setLoading(false);
     }
-  }
+};
 
   return (
     <div className="flex flex-col h-full text-gray-100">
