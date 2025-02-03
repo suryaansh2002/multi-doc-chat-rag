@@ -1,5 +1,6 @@
 const { Pinecone } = require('@pinecone-database/pinecone');
 const OpenAI = require('openai');
+const { Configuration, OpenAIApi } = require('openai');
 
 class PineconeService {
     constructor() {
@@ -9,9 +10,13 @@ class PineconeService {
 
         this.index = this.pc.index(process.env.PINECONE_INDEX_NAME);
 
-        this.openai = new OpenAI({
-            apiKey: process.env.OPENAI_API_KEY
+
+        const configuration = new Configuration({
+        apiKey: process.env.OPENAI_API_KEY,
         });
+
+        this.openai = new OpenAIApi(configuration);
+
 
         this.embedBatchSize = 100;
         this.upsertBatchSize = 100;
