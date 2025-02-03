@@ -38,7 +38,7 @@ class OpenAIService {
           },
         ],
         temperature: 0.8,
-        max_tokens: 300,
+        max_tokens: 400,
       });
 
       return response.data.choices[0].message.content;
