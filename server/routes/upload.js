@@ -8,7 +8,7 @@ const pdfParse = require('pdf-parse');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const pineconeService = new PineconeService();
-const { TokenTextSplitter } = require("@langchain/textsplitters");
+const { TokenTextSplitter } = require("langchain/text_splitter");
 
 // Add auth middleware to all routes
 router.use(auth);
