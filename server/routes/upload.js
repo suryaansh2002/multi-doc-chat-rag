@@ -8,26 +8,39 @@ const pdfParse = require('pdf-parse');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const pineconeService = new PineconeService();
-const { TokenTextSplitter } = require("langchain/text_splitter");
+const Tiktoken = require('@dqbd/tiktoken');
 
 // Add auth middleware to all routes
 router.use(auth);
 
 
-async function splitIntoChunks(text) {
+function splitIntoChunks(text) {
     // Clean text while preserving structure
     const cleanText = cleanProcessText(text);
     
-    // Initialize token-based splitter
-    const splitter = new TokenTextSplitter({
-        encodingName: "cl100k_base", // OpenAI's tokenizer
-        chunkSize: 512,
-        chunkOverlap: 50,
-        allowedSpecial: "all" // Handle special tokens properly
-    });
-
-    // Split text into chunks
-    let chunks = await splitter.splitText(cleanText);
+    // Initialize OpenAI tokenizer
+    const encoder = Tiktoken.get_encoding("cl100k_base");
+    const tokens = encoder.encode(cleanText);
+    
+    // Chunking configuration
+    const chunkSize = 512;
+    const chunkOverlap = 50;
+    const chunks = [];
+    
+    // Generate chunks with overlap
+    let start = 0;
+    while (start < tokens.length) {
+        const end = Math.min(start + chunkSize, tokens.length);
+        const chunkTokens = tokens.slice(start, end);
+        chunks.push(encoder.decode(chunkTokens));
+        
+        // Move window with overlap, ensuring we don't go backward
+        start = end - chunkOverlap;
+        if (start < (end - chunkOverlap)) break; // Prevent infinite loops
+    }
+    
+    // Clean up tokenizer resources
+    encoder.free();
 
     // Post-process chunks
     return postProcessChunks(chunks);
