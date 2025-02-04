@@ -13,8 +13,7 @@
   "dependencies": {
     "mongodb": "^4.17.0",
     "mongoose": "^6.12.0",
-    "@langchain/core": "0.1.17",
-    "langchain": "0.1.17",
+    "langchain": "0.0.92",
     "@dqbd/tiktoken": "^1.0.19",
     "@pinecone-database/pinecone": "^4.1.0",
     "bcryptjs": "^2.4.3",
