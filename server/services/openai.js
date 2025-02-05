@@ -47,6 +47,33 @@ class OpenAIService {
       throw error;
     }
   }
+
+
+  async generateSummary(transcript) {
+    try {
+      const response = await this.client.createChatCompletion({
+        model: "gpt-4-0125-preview", // Base GPT-4, often faster than turbo
+        messages: [
+          {
+            role: "system",
+            content:
+              "Understand the transcript of the video given by the user and generate a short summary of the youtube video. Return your answer in well structured, and formatted markdown.",
+          },
+          {
+            role: "user",
+            content: `Transcript: ${transcript}`,
+          },
+        ],
+        temperature: 0.8,
+        max_tokens: 500,
+      });
+
+      return response.data.choices[0].message.content;
+    } catch (error) {
+      console.error('Error generating response:', error);
+      throw error;
+    }
+  }
 }
 
 module.exports = { OpenAIService };

@@ -8,60 +8,11 @@ const pdfParse = require('pdf-parse');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const pineconeService = new PineconeService();
-const Tiktoken = require('@dqbd/tiktoken');
+const {splitIntoChunks} = require('../services/utils')
 
 // Add auth middleware to all routes
 router.use(auth);
 
-
-function splitIntoChunks(text) {
-    // Clean text while preserving structure
-    const cleanText = cleanProcessText(text);
-    
-    // Initialize OpenAI tokenizer
-    const encoder = Tiktoken.get_encoding("cl100k_base");
-    const tokens = encoder.encode(cleanText);
-    
-    // Chunking configuration
-    const chunkSize = 512;
-    const chunkOverlap = 50;
-    const chunks = [];
-    
-    // Generate chunks with overlap
-    let start = 0;
-    while (start < tokens.length) {
-        const end = Math.min(start + chunkSize, tokens.length);
-        const chunkTokens = tokens.slice(start, end);
-        chunks.push(encoder.decode(chunkTokens));
-        
-        // Move window with overlap, ensuring we don't go backward
-        start = end - chunkOverlap;
-        if (start < (end - chunkOverlap)) break; // Prevent infinite loops
-    }
-    
-    // Clean up tokenizer resources
-    encoder.free();
-
-    // Post-process chunks
-    return postProcessChunks(chunks);
-}
-
-function cleanProcessText(text) {
-    return text
-        .replace(/\r\n/g, '\n') // Normalize line breaks
-        .replace(/(\n\s*){2,}/g, '\n\n') // Preserve paragraph breaks
-        .replace(/[^\S\n]+/g, ' ') // Collapse multiple spaces
-        .trim();
-}
-
-function  postProcessChunks(chunks) {
-    const seen = new Set();
-    return chunks.filter(chunk => {
-        const content = chunk.trim();
-        // Remove empty chunks and duplicates (case-sensitive)
-        return content.length > 0 && !seen.has(content) && seen.add(content);
-    });
-}
 
 
 router.post('/', upload.single('file'), async (req, res) => {
@@ -71,7 +22,6 @@ router.post('/', upload.single('file'), async (req, res) => {
         }
         const { text } = await pdfParse(req.file.buffer);
         // Create document in MongoDB with user ID
-        console.log(text)
         const document = new Document({
             filename: req.file.originalname,
             content: text,

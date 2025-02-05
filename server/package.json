@@ -13,6 +13,7 @@
   "dependencies": {
     "@dqbd/tiktoken": "^1.0.20",
     "@pinecone-database/pinecone": "^4.1.0",
+    "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",

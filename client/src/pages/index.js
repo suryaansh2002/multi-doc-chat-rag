@@ -9,11 +9,16 @@ function Home() {
   const [selectedDocs, setSelectedDocs] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [activeTab, setActiveTab] = useState("pdf")
+  const [youtubeUrl, setYoutubeUrl] = useState("")
+  const [youtubeVideos, setYoutubeVideos] = useState([])
   const router = useRouter()
   const { logout } = useAuth()
+  const [isDeletingVideo, setIsDeletingVideo] = useState(false)
 
   useEffect(() => {
     fetchDocuments()
+    fetchYoutubeVideos()
   }, [])
 
   const fetchDocuments = async () => {
@@ -37,6 +42,25 @@ function Home() {
       setError("Failed to load documents. Please refresh the page to try again.")
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchYoutubeVideos = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/videos`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch YouTube videos")
+      }
+
+      const data = await response.json()
+      setYoutubeVideos(data)
+    } catch (error) {
+      console.error("Error fetching YouTube videos:", error)
     }
   }
 
@@ -66,6 +90,62 @@ function Home() {
     }
   }
 
+  const handleYoutubeUpload = async (e) => {
+    e.preventDefault()
+    const videoId = new URL(youtubeUrl).searchParams.get("v")
+    if (!videoId) {
+      setError("Invalid YouTube URL")
+      return
+    }
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/videos`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ videoId }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to upload YouTube video")
+      }
+
+      setYoutubeUrl("")
+      fetchYoutubeVideos()
+    } catch (error) {
+      console.error("Error uploading YouTube video:", error)
+      setError("Failed to upload YouTube video. Please try again.")
+    }
+  }
+
+  const handleDeleteVideo = async (videoId) => {
+    if (isDeletingVideo) return
+
+    setIsDeletingVideo(true)
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/videos/${videoId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to delete YouTube video")
+      }
+
+      // Remove the deleted video from the state
+      setYoutubeVideos((prevVideos) => prevVideos.filter((video) => video._id !== videoId))
+    } catch (error) {
+      console.error("Error deleting YouTube video:", error)
+      setError("Failed to delete YouTube video. Please try again.")
+    } finally {
+      setIsDeletingVideo(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
       <nav className="bg-gray-800 shadow">
@@ -89,38 +169,100 @@ function Home() {
 
       <main className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <FileUpload onUploadSuccess={handleUploadSuccess} />
+          <div className="flex border-b border-gray-700">
+            <button
+              className={`py-2 px-4 ${activeTab === "pdf" ? "border-b-2 border-blue-500" : ""}`}
+              onClick={() => setActiveTab("pdf")}
+            >
+              PDF Documents
+            </button>
+            <button
+              className={`py-2 px-4 ${activeTab === "youtube" ? "border-b-2 border-blue-500" : ""}`}
+              onClick={() => setActiveTab("youtube")}
+            >
+              YouTube Videos
+            </button>
+          </div>
         </div>
 
-        {loading ? (
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-            <p className="mt-2 text-gray-400">Loading documents...</p>
-          </div>
-        ) : error ? (
-          <div className="bg-red-900 border border-red-700 text-red-100 px-4 py-3 rounded relative" role="alert">
-            <p>{error}</p>
-          </div>
-        ) : (
-          <div className="mb-8">
-            <FileList
-              documents={documents}
-              selectedDocs={selectedDocs}
-              onDocumentSelect={handleDocumentSelect}
-              onDocumentsChange={handleDocumentsChange}
-            />
-          </div>
-        )}
+        {activeTab === "pdf" ? (
+          <>
+            <div className="mb-8">
+              <FileUpload onUploadSuccess={handleUploadSuccess} />
+            </div>
 
-        {selectedDocs.length > 0 && (
-          <div className="fixed bottom-8 right-8">
-            <button
-              onClick={startChat}
-              className="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 shadow-lg flex items-center space-x-2 transition-all hover:scale-105"
-            >
-              <MessageCircle className="h-5 w-5" />
-              <span>Start Chat with Selected Documents</span>
-            </button>
+            {loading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                <p className="mt-2 text-gray-400">Loading documents...</p>
+              </div>
+            ) : error ? (
+              <div className="bg-red-900 border border-red-700 text-red-100 px-4 py-3 rounded relative" role="alert">
+                <p>{error}</p>
+              </div>
+            ) : (
+              <div className="mb-8">
+                <FileList
+                  documents={documents}
+                  selectedDocs={selectedDocs}
+                  onDocumentSelect={handleDocumentSelect}
+                  onDocumentsChange={handleDocumentsChange}
+                />
+              </div>
+            )}
+
+            {selectedDocs.length > 0 && (
+              <div className="fixed bottom-8 right-8">
+                <button
+                  onClick={startChat}
+                  className="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 shadow-lg flex items-center space-x-2 transition-all hover:scale-105"
+                >
+                  <MessageCircle className="h-5 w-5" />
+                  <span>Start Chat with Selected Documents</span>
+                </button>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="space-y-8">
+            <form onSubmit={handleYoutubeUpload} className="flex gap-4">
+              <input
+                type="text"
+                value={youtubeUrl}
+                onChange={(e) => setYoutubeUrl(e.target.value)}
+                placeholder="Enter YouTube URL"
+                className="flex-grow px-4 py-2 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                type="submit"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Upload
+              </button>
+            </form>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {youtubeVideos.map((video) => (
+                <div key={video._id} className="bg-gray-800 rounded-lg overflow-hidden relative">
+                  <img
+                    src={video.thumbnail || "/placeholder.svg"}
+                    alt={video.title}
+                    className="w-full h-40 object-cover"
+                  />
+                  <div className="p-4">
+                    <h3 className="font-semibold text-lg mb-2">{video.title}</h3>
+                    <p className="text-gray-400 text-sm line-clamp-2">{video.description}</p>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteVideo(video._id)}
+                    className="absolute top-2 right-2 p-2 bg-red-600 text-white rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+                    disabled={isDeletingVideo}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </main>
@@ -231,8 +373,8 @@ function FileList({ documents, selectedDocs, onDocumentSelect, onDocumentsChange
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload/${documentToDelete._id}`, {
         method: "DELETE",
         headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       })
 
       if (!response.ok) {
