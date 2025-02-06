@@ -3,6 +3,7 @@ import { useRouter } from "next/router"
 import { useAuth } from "../contexts/AuthContext"
 import ProtectedRoute from "../components/ProtectedRoute"
 import { LogOut, MessageCircle, Upload, FileText, Check, Trash2, X } from "lucide-react"
+import ClipLoader from "react-spinners/ClipLoader";
 
 function Home() {
   const [documents, setDocuments] = useState([])
@@ -15,7 +16,7 @@ function Home() {
   const router = useRouter()
   const { logout } = useAuth()
   const [isDeletingVideo, setIsDeletingVideo] = useState(false)
-
+  const [uploadingVideo, setUploadingVideo] = useState(false);
   useEffect(() => {
     fetchDocuments()
     fetchYoutubeVideos()
@@ -90,8 +91,17 @@ function Home() {
     }
   }
 
+  const startVideoChat = (videoId) => {
+      router.push({
+        pathname: "/videoChat",
+        query: { video: videoId },
+      })
+  }
+
+
   const handleYoutubeUpload = async (e) => {
     e.preventDefault()
+    setUploadingVideo(true);
     const videoId = new URL(youtubeUrl).searchParams.get("v")
     if (!videoId) {
       setError("Invalid YouTube URL")
@@ -114,13 +124,16 @@ function Home() {
 
       setYoutubeUrl("")
       fetchYoutubeVideos()
+      setUploadingVideo(false);
     } catch (error) {
       console.error("Error uploading YouTube video:", error)
       setError("Failed to upload YouTube video. Please try again.")
+      setUploadingVideo(false);
     }
   }
 
-  const handleDeleteVideo = async (videoId) => {
+  const handleDeleteVideo = async (e, videoId) => {
+    e.stopPropagation();
     if (isDeletingVideo) return
 
     setIsDeletingVideo(true)
@@ -232,18 +245,24 @@ function Home() {
                 onChange={(e) => setYoutubeUrl(e.target.value)}
                 placeholder="Enter YouTube URL"
                 className="flex-grow px-4 py-2 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={uploadingVideo}
               />
               <button
                 type="submit"
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                disabled={uploadingVideo}
+
               >
-                Upload
+                {uploadingVideo 
+                ? 
+                <ClipLoader size={20}/>
+                :'Upload'}
               </button>
             </form>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {youtubeVideos.map((video) => (
-                <div key={video._id} className="bg-gray-800 rounded-lg overflow-hidden relative">
+                <div key={video._id} className="bg-gray-800 rounded-lg overflow-hidden relative cursor-pointer" onClick={()=>startVideoChat(video.videoId)}>
                   <img
                     src={video.thumbnail || "/placeholder.svg"}
                     alt={video.title}
@@ -254,7 +273,7 @@ function Home() {
                     <p className="text-gray-400 text-sm line-clamp-2">{video.description}</p>
                   </div>
                   <button
-                    onClick={() => handleDeleteVideo(video._id)}
+                    onClick={(e) => handleDeleteVideo(e, video._id)}
                     className="absolute top-2 right-2 p-2 bg-red-600 text-white rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800"
                     disabled={isDeletingVideo}
                   >
