@@ -58,24 +58,26 @@ This project is a Document Q&A System that allows users to upload PDF documents,
 ### Server
 
 - **Main Entry Point**: The server application is initialized in a main file that sets up Express, connects to MongoDB, and defines routes.
-  - Reference: `server/server.js` (startLine: 1, endLine: 36)
+  - `server/server.js` 
 
 - **Routes**: Handles API endpoints for uploading and querying documents. There are separate routes for managing uploads and chat interactions.
-  - Upload Route: `server/routes/upload.js` (startLine: 1, endLine: 91)
-  - Chat Route: `server/routes/chat.js` (startLine: 1, endLine: 38)
+  - Document Routes: `server/routes/upload.js` 
+  - Document Chat Route: `server/routes/chat.js` 
+  - Video Routes: `server/routes/videos.js` 
+  - Video Chat Route: `server/routes/videoChat.js` 
+  - Authentication Routes `server/routes/auth.js`  `server/routes/passwordReset.js` 
 
-- **Services**: Contains logic for interacting with external services like OpenAI and Pinecone.
 
-- **Models**: Defines MongoDB schemas for storing document metadata and vector IDs.
+- **Services**: Contains logic for interacting with external services like OpenAI and Pinecone, YoutubeAPI and Util functions.
+
+- **Models**: Defines MongoDB schemas for storing storing document, videos metadata and vector IDs.
 
 ### Client
 
-- **Pages**: Defines the main pages of the application, including the home page for document management and a chat page for interactions.
-  - Home Page: `client/src/pages/index.js` (startLine: 7, endLine: 107)
-  - Chat Page: `client/src/pages/chat.js` (startLine: 1, endLine: 42)
+- **Pages**: Defines the main pages of the application, including the home page for document management and a chat pages for interactions.
 
 - **Components**: Reusable UI components for file uploads, document lists, and chat interactions.
-  - Chat Component: `client/src/components/Chat.js` (startLine: 7, endLine: 68)
+  - Chat Component: `client/src/components/Chat.js` `client/src/components/VideoChat.js`
 
 - **Styles**: Global styles for the application, ensuring a consistent look and feel across different components and pages.
 
