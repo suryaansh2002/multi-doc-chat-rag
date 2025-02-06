@@ -118,7 +118,7 @@ export default function VideoChat({ videoId }) {
               <p className="text-sm">
                 <Markdown>{message.content}</Markdown>
               </p>
-              {message.sources && message.sources.length > 0 && <SourceViewer sources={message.sources} />}
+              {/* {message.sources && message.sources.length > 0 && <SourceViewer sources={message.sources} />} */}
             </div>
           </div>
         ))}

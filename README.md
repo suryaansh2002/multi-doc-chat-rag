@@ -7,8 +7,9 @@
 3. [Setup Instructions](#setup-instructions)
 4. [Project Structure](#project-structure)
 5. [Deployment](#deployment)
-5. [Navigation](#navigation)
-6. [License](#license)
+6. [Navigation](#navigation)
+7. [Screenshots](#screenshots)
+8. [License](#license)
 
 ## Overview
 
@@ -83,14 +84,34 @@ This project is a Document Q&A System that allows users to upload PDF documents,
 - **Server**: Deployed on Vercel at [https://multi-doc-chat-rag.vercel.app/](https://multi-doc-chat-rag.vercel.app/)
 - **Client**: Deployed on Vercel at [https://multi-doc-chat-rag-client.vercel.app/](https://multi-doc-chat-rag-client.vercel.app/)
 
-
 ## Navigation
 
 - **Uploading Documents**: Navigate to the client application in your browser. Use the upload interface to select and upload PDF documents.
 - **Viewing Documents**: Uploaded documents will appear in a list. You can select documents to interact with them.
 - **Chatting with Documents**: Use the chat interface to ask questions about the selected documents. The system will generate responses based on the document content.
 
+## Screenshots
+
+Here are some screenshots of the application to give you a visual overview:
+
+- **Landing Page with Documents**: 
+  ![Landing Page Documents](assets/1_Landing_Page_Documents.png)
+
+- **Landing Page with Selected Documents**: 
+  ![Landing Page Documents Selected](assets/2_Landing_Page_Documents_Selected.png)
+
+- **Documents Chat Interface**: 
+  ![Documents Chat](assets/3_Documents_Chat.png)
+
+- **Documents Chat with Sources**: 
+  ![Documents Chat Sources](assets/4_Documents_Chat_Sources.png)
+
+- **Landing Page with Videos**: 
+  ![Landing Page Videos](assets/5_Landing_Page_Videos.png)
+
+- **Videos Chat Interface**: 
+  ![Videos Chat](assets/6_Videos_Chat.png)
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE.md) file for details.
-
