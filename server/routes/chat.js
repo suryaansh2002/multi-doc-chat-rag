@@ -28,7 +28,7 @@ router.post('/query/context', async (req, res) => {
         if (documents.length !== documentIds.length) {
             return res.status(403).json({ error: 'Access denied to one or more documents' });
         }
-
+        console.log("Document IDs: ", documentIds)
         // Get relevant context from Pinecone
         const relevantContexts = await pineconeService.queryVectors(query, documentIds);
         // Combine contexts with a maximum length limit
